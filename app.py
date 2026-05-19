@@ -49,9 +49,7 @@ st.markdown(
 # LOAD MODEL
 # =========================
 
-model = YOLO(
-    r"C:\Users\ranja\runs\detect\train-2\weights\best.pt"
-)
+model = YOLO("best.pt")
 
 print("Model Loaded Successfully")
 print(model.names)
