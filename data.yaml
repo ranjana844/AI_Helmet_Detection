@@ -1,0 +1,16 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+
+names:
+  0: helmet
+  1: no_helmet
+
+roboflow:
+  workspace: uit-vbp9l
+  project: helmet-pwtak
+  version: 8
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/uit-vbp9l/helmet-pwtak/dataset/8

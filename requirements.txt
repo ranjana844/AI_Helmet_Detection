@@ -1,0 +1,12 @@
+streamlit
+streamlit-webrtc
+opencv-python-headless==4.10.0.84
+ultralytics
+torch
+torchvision
+numpy
+pandas
+Pillow
+fer
+reportlab
+av
