@@ -78,4 +78,54 @@ def detect_number_plate(frame):
             2
         )
 
+    # ====================================================
+    # FALLBACK: SCAN ENTIRE FRAME IF CONTOURS FAILED OR UNKNOWN
+    # ====================================================
+    if plate_text == "UNKNOWN" or len(plate_text.strip()) < 4:
+        results = reader.readtext(frame)
+        best_candidate = None
+        best_box = None
+        
+        # Phase 1: Try to find a strict license plate format (e.g. MH12AB1234)
+        for res in results:
+            text = res[1].strip().upper()
+            alphanumeric = "".join([c for c in text if c.isalnum()])
+            has_letter = any(c.isalpha() for c in alphanumeric)
+            has_digit = any(c.isdigit() for c in alphanumeric)
+            
+            if len(alphanumeric) >= 5 and len(alphanumeric) <= 15 and has_letter and has_digit:
+                best_candidate = text
+                best_box = res[0]
+                break
+                
+        # Phase 2: If no strict format, take the longest text block with at least some numbers/letters
+        if not best_candidate:
+            for res in results:
+                text = res[1].strip().upper()
+                alphanumeric = "".join([c for c in text if c.isalnum()])
+                if len(alphanumeric) >= 4:
+                    best_candidate = text
+                    best_box = res[0]
+                    break
+                    
+        # If we successfully found a fallback candidate, draw and save it
+        if best_candidate:
+            plate_text = best_candidate
+            box = best_box
+            xs = [pt[0] for pt in box]
+            ys = [pt[1] for pt in box]
+            tx, ty = int(min(xs)), int(min(ys))
+            tw, th = int(max(xs) - tx), int(max(ys) - ty)
+            
+            cv2.rectangle(frame, (tx, ty), (tx + tw, ty + th), (0, 255, 0), 2)
+            cv2.putText(
+                frame,
+                plate_text,
+                (tx, ty - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (0, 255, 0),
+                2
+            )
+
     return frame, plate_text

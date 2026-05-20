@@ -12,6 +12,7 @@ from adaptive_signal import get_signal_time
 from accident_prediction import detect_accident
 from database import insert_violation
 from report_generator import generate_report
+from number_plate import detect_number_plate
 
 # =========================
 # PAGE SETTINGS
@@ -79,13 +80,13 @@ class HelmetProcessor(VideoProcessorBase):
         # NUMBER PLATE
         # =========================
 
-        plate_number = "TN01AB1234"
+        plate_number = "UNKNOWN"
 
         # =========================
         # YOLO DETECTION
         # =========================
 
-        results = model(img, verbose=False)
+        results = model(img, imgsz=320, verbose=False)
 
         helmet_detected = False
         no_helmet_detected = False
@@ -153,6 +154,13 @@ class HelmetProcessor(VideoProcessorBase):
                     color,
                     2
                 )
+
+        # =========================
+        # NUMBER PLATE OCR DETECTION
+        # =========================
+
+        if no_helmet_detected:
+            img, plate_number = detect_number_plate(img)
 
         # =========================
         # SIGNAL LOGIC
@@ -379,6 +387,9 @@ webrtc_streamer(
     media_stream_constraints={
         "video": True,
         "audio": False
+    },
+    rtc_configuration={
+        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     },
     desired_playing_state=True
 )

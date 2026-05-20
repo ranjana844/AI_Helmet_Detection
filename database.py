@@ -3,7 +3,6 @@ from datetime import datetime
 
 # Create database
 conn = sqlite3.connect("traffic_system.db")
-
 cursor = conn.cursor()
 
 # Create table
@@ -16,10 +15,13 @@ CREATE TABLE IF NOT EXISTS violations (
 """)
 
 conn.commit()
+conn.close()
 
 # Insert violation function
 def insert_violation(violation):
-
+    conn = sqlite3.connect("traffic_system.db")
+    cursor = conn.cursor()
+    
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     cursor.execute("""
@@ -31,3 +33,4 @@ def insert_violation(violation):
     """, (violation, current_time))
 
     conn.commit()
+    conn.close()

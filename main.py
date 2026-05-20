@@ -8,14 +8,13 @@ from emotion_detection import detect_emotion
 from adaptive_signal import get_signal_time
 from accident_prediction import detect_accident
 from report_generator import generate_report
+from number_plate import detect_number_plate
 
 # =========================
 # LOAD MODEL
 # =========================
 
-model = YOLO(
-    r"C:\Users\ranja\runs\detect\train-2\weights\best.pt"
-)
+model = YOLO("best.pt")
 
 print("Model Loaded Successfully")
 print("Class Names:", model.names)
@@ -60,7 +59,7 @@ print("Camera Started Successfully")
 # VARIABLES
 # =========================
 
-plate_number = "TN01AB1234"
+plate_number = "UNKNOWN"
 
 last_save_time = 0
 
@@ -183,6 +182,13 @@ while True:
             )
 
     # =========================
+    # NUMBER PLATE OCR DETECTION
+    # =========================
+
+    if no_helmet_detected:
+        frame, plate_number = detect_number_plate(frame)
+
+    # =========================
     # SIGNAL LOGIC
     # =========================
 
@@ -215,11 +221,10 @@ while True:
         overspeed=False
     )
 
-    # =========================
-    # EMOTION DETECTION
-    # =========================
+    emotion = "Unknown"
 
-    emotion = detect_emotion(frame)
+    if no_helmet_detected:
+        emotion = detect_emotion(frame)
 
     # =========================
     # SIGNAL TIMER
