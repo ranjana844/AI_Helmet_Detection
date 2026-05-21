@@ -2,8 +2,14 @@ import cv2
 import easyocr
 import imutils
 
-# Initialize OCR
-reader = easyocr.Reader(['en'])
+_reader = None
+
+def get_reader():
+    global _reader
+    if _reader is None:
+        # Initialize EasyOCR lazily on CPU to guarantee thread-safety inside Streamlit WebRTC threads
+        _reader = easyocr.Reader(['en'], gpu=False)
+    return _reader
 
 def detect_number_plate(frame):
 
@@ -53,7 +59,7 @@ def detect_number_plate(frame):
         plate = frame[y:y + h, x:x + w]
 
         # OCR text extraction
-        result = reader.readtext(plate)
+        result = get_reader().readtext(plate)
 
         for res in result:
 
@@ -82,7 +88,7 @@ def detect_number_plate(frame):
     # FALLBACK: SCAN ENTIRE FRAME IF CONTOURS FAILED OR UNKNOWN
     # ====================================================
     if plate_text == "UNKNOWN" or len(plate_text.strip()) < 4:
-        results = reader.readtext(frame)
+        results = get_reader().readtext(frame)
         best_candidate = None
         best_box = None
         
