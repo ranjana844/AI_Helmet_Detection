@@ -1,5 +1,8 @@
 import streamlit as st
-import cv2
+try:
+    import cv2
+except:
+    st.error("OpenCV not installed properly")
 import av
 import time
 import threading
